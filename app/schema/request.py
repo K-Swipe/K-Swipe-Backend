@@ -24,18 +24,18 @@ from typing import List, Dict
 
 
 class TravelPlan(BaseModel):
-    place: List[str]  # 사용자가 선택한 구역 목록
-    howmany: int  # 방문 경험 정도(0~4)
+    place: List[str]   # 사용자가 선택한 구역 목록
+    howmany: int | str  # 방문 경험 정도(0~4)
     style: str  # 선호하는 여행 스타일 (city or nature)
-    reason: int  # 여행의 목적 (0~4)
-    thema: List[str]  # 선호하는 여행 테마 목록
+    reason: int | str # 여행의 목적 (0~4)
+    thema: List[str] | str  # 선호하는 여행 테마 목록
 
 
 class TravelProfile(BaseModel):
-    age: int  # 사용자 연령대 (10, 20, 30, 40)
+    age: int | str # 사용자 연령대 (10, 20, 30, 40)
     gender: str  # 사용자 성별
-    people: int  # 동행 인원(1~5)
-    price: List[int]  # 예상 지출 비용 범위 - 입력만 받음
+    people: int | str # 동행 인원(1~5)
+    # price: List[int] | str # 예상 지출 비용 범위 - 입력만 받음
     traffic: str  # 선호하는 교통 수단 (car or bus)
 
 

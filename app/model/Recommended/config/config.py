@@ -7,7 +7,8 @@ class Config:
     places_path = data_path / "coordinates-final.csv"
     model_path = data_path / "catboost_model_B.pkl"
     followup_places_path = data_path / "followup_places.csv"
-    
+    spot_info = data_path / "관광지 추천시스템 Trainset.csv"
+        
     # Inference
     final_columns = ["VISIT_AREA_NM", "SIDO", "GUNGU", "VISIT_AREA_TYPE_CD", "TRAVEL_MISSION_PRIORITY", "MVMN_NM","GENDER",
                      "AGE_GRP","TRAVEL_STYL", "TRAVEL_MOTIVE_1", "TRAVEL_NUM", "TRAVEL_COMPANIONS_NUM","RESIDENCE_TIME_MIN_mean", "RCMDTN_INTENTION_mean", "REVISIT_YN_mean", "TRAVEL_COMPANIONS_NUM_mean", "REVISIT_INTENTION_mean"]
