@@ -39,9 +39,10 @@ async def social_auth(
         print(user_data)
 
         user = user_repo.get_user(user_data.email, social=user_data.social)
+        # print(user_repo.get_user(user_data.email, social=user_data.social))
         print(user)
 
-        # 존재하는 회원시 로그인처리
+        ## 존재하는 회원시 로그인처리
         if user:
             print("로그인처리")
             access_token: str = user_service.create_jwt(username=user.username)
@@ -69,4 +70,4 @@ async def social_auth(
             return JSONResponse(status_code=status.HTTP_200_OK, content=response_body)
 
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

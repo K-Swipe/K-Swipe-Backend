@@ -50,6 +50,7 @@ class UserService:
 
     def auth_google(self, code: str):
         print("auth_google")
+        print(code)
         try:
             # google에 access token 요청
             token_url = f"https://oauth2.googleapis.com/token?client_id={GOOGLE_CLIENT_ID}&client_secret={GOOGLE_SECRET_KEY}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}"

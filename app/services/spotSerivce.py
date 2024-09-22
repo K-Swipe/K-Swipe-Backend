@@ -1,5 +1,5 @@
 from fastapi import Depends
-from schema.response import SpotListSchema, SpotSchema
+from schema.response import PhotoListResponse, PhotoResponse, SpotListSchema, SpotSchema
 from entities.spot import Spot
 from repository.spotRepository import SpotRepository
 
@@ -18,3 +18,8 @@ class SpotService:
         spot_list: list[Spot] = self.spotRepository.get_spot_list()
 
         return SpotListSchema(spots=[SpotSchema.from_orm(spot) for spot in spot_list])
+
+    def get_spot_photo_list(self) -> PhotoListResponse:
+        spot_list: list[Spot] = self.spotRepository.get_spot_list()
+
+        return PhotoListResponse(spots=[PhotoResponse.from_orm(spot) for spot in spot_list])

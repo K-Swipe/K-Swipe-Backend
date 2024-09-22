@@ -80,3 +80,30 @@ class RecommendationResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ShortResponse(BaseModel):
+    videoUrl: str
+    title: str
+    description: str
+    channelTitle: str
+
+
+class PhotoResponse(BaseModel):
+    id: int
+    main_img_n: str
+    name: str
+    title: str
+    subtitle: str
+    addr1: str
+    kakao_rating: float
+
+    class Config:
+        orm_mode = True
+
+
+class PhotoListResponse(BaseModel):
+    spots: list[PhotoResponse]
+
+    class Config:
+        orm_mode = True
