@@ -33,6 +33,7 @@ class TravelPlan(BaseModel):
 
 class TravelProfile(BaseModel):
     age: int  # 사용자 연령대 (10, 20, 30, 40)
+    gender: str  # 사용자 성별
     people: int  # 동행 인원(1~5)
     price: List[int]  # 예상 지출 비용 범위 - 입력만 받음
     traffic: str  # 선호하는 교통 수단 (car or bus)
