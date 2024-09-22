@@ -1,13 +1,8 @@
 import joblib
 import pandas as pd
 import numpy as np
-import yaml
 
 from Recommended.config import cfg
-from sorted_place import nearest_neighbor_tsp
-
-with open("Recommended/config/questions.yaml", encoding="utf-8") as f:
-    label_file = yaml.load(f, Loader=yaml.FullLoader)
 
 
 def convert_float_to_int(df):
@@ -98,6 +93,15 @@ def generate_user_info_df(final_df):
     return final_df[cfg.user_columns]
 
 
+def find_hotplace(df, top_k=10):
+    import random
+
+    hotplace = df["VISIT_AREA_NM"].value_counts().reset_index()
+    results = hotplace["index"][:30].tolist()
+    recommended_places = random.sample(results, top_k)
+    return recommended_places
+
+
 def main(info, new_user_info, model):
     """
     Main function to generate recommendations and user information.
@@ -118,50 +122,16 @@ def main(info, new_user_info, model):
     visiting_candidates = recommend_places(model, final_df)
     user_info_df = generate_user_info_df(final_df)
 
+    # Exception handling for empty user_info_df(해당 지역에 관광지가 없는 경우)
     if len(user_info_df) == 0:
-        result.append([])
+        places = pd.read_csv(cfg.followup_places_path)
+        result = find_hotplace(places)
     else:
         rec = user_info_df.iloc[0].to_list()
         rec.append(visiting_candidates)
         result.append(rec)
-
+        result = result[0][-1]
     return result
-
-
-def question():
-    columns = [
-        "TRAVEL_MISSION_PRIORITY",
-        "MVMN_NM",
-        "GENDER",
-        "AGE_GRP",
-        "INCOME",
-        "TRAVEL_STYL",
-        "TRAVEL_MOTIVE_1",
-        "TRAVEL_NUM",
-        "TRAVEL_COMPANIONS_NUM",
-        "sido_gungu_list",
-    ]
-    user_data = []
-    for col in columns:
-        print(col)
-        question = label_file[col]
-
-        try:
-            value = input(f"다음중 하나를 선택해 주세용: {question.keys()}: ")
-            user_data.append(question[value])
-        except:
-            value = input(f"입력해주세용: {col}: ")
-            user_data.append(value)
-
-    user_data = pd.DataFrame(np.array(user_data).reshape(1, -1), columns=columns)
-    return user_data
-
-
-def sorted_place(result, places):
-    result = result[0][-1]
-    matched_data = places[places["VISIT_AREA_NM"].isin(result)]
-    sorted_data = matched_data.sort_values(by="population", ascending=False)
-    return sorted_data
 
 
 if __name__ == "__main__":
@@ -169,24 +139,5 @@ if __name__ == "__main__":
     recommend_model = joblib.load(cfg.model_path)
     # places = pd.read_csv(cfg.places_path)
     test_data = pd.read_pickle("TestData.pkl")
-    # test_data = question()
     result = main(info, test_data, recommend_model)
-    print(result[0])
-    # result = sorted_place(result, places)
-
-    # """TSP"""
-    # start = (129.162576586723, 35.1594965345398)
-    # points = list(zip(result["X_COORD"], result["Y_COORD"]))
-    # path = nearest_neighbor_tsp(start, points)
-    # path_indices = [points.index(p) for p in path if p in points]
-    # sorted_df = result.iloc[path_indices].reset_index(drop=True)
-
-    # print(sorted_df['VISIT_AREA_NM'].tolist())
-
-    # [['부산', 22, '대중교통 등', '여', 20, 4, 7, 7, 3, 6, 4, 5, 7, 3, 7, 4, 0, ['부산시립미술관', '일광해수욕장', '벡스코 제2전시장', '청사포 다릿돌 전망대', '스카이라인루지 부산', '신세계 센텀시티몰', '뮤지엄원', '더베이101', '수영만요트경기장', '송정해수욕장']]]
-
-    # [['부산', 2, '자가용', '여', 30, 5, 3, 1, 2, 2, ['청사포 다릿돌 전망대', '해운대 모래축제', '동백섬', '청사포다릿돌전망대', '광복로 패션거리', '벡스코', '해운대 블루라인파크 미포 정거장', '부평깡통시장', '신세계 센텀시티몰', '해운대블루라인파크 청사포정거장']]]
-
-    # [['부산', 2, '자가용', '여', 30, 5, 3, 1, 2, 2, ['신세계 센텀시티몰', '부평깡통시장', '롯데백화점 광복점', '광복로 패션거리', '라이언 홀리데이 인 부산', '롯데마트 광복점', '벡스코', '용두산공원', '청사포 다릿돌 전망대', '해운대블루라인파크 청사포정거장']]]
-
-    # [['부산', 2, '자가용', '여', 30, 5, 3, 1, 2, 2, ['해운대블루라인파크 청사포정거장', '청사포 다릿돌 전망대', '해운대 블루라인파크 송정 정거장', '동백섬', '해운대 블루라인파크 미포 정거장', '해운대 해수욕장', '부평깡통시장', '영화의전당', '센텀시티 스파랜드', '더베이101']]]
+    print(result)
