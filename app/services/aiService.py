@@ -40,8 +40,9 @@ class AIService:
             }
         )
         recommneded_place = prediction(self.info, input_df, self.model)
-        self.recommneded_place = recommneded_place
-        print(self.recommneded_place)
+        # self.recommneded_place = recommneded_place
+        # print(self.recommneded_place)
+        return recommneded_place
 
     def is_blank_array(self, value, column_name):
         if value == "":

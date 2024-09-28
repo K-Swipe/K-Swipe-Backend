@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 import numpy as np
 
-from .config import cfg
+from model.Recommended.config import cfg
 
 
 def convert_float_to_int(df):

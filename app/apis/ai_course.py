@@ -13,8 +13,13 @@ def generate_ai_course(request: RecommendationRequest, ai_service: AIService = D
 
     generate_course: RecommendationResponse = ai_service.get_recommendation(request)
 
+    request_body = {
+        "message": "AI 추천 코스 생성 성공",
+        "course": generate_course,
+    }
+
     try:
-        return generate_course
+        return request_body
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal Server Error")
