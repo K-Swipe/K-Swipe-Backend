@@ -107,3 +107,11 @@ class PhotoListResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TumbsupResponse(BaseModel):
+    spot_id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True

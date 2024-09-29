@@ -49,9 +49,10 @@ async def social_auth(
 
             response_body = {
                 "message": "oauth login successful",
-                "name": user_data.username,
-                "email": user_data.email,
-                "social": user_data.social,
+                "name": user.username,
+                "email": user.email,
+                "social": user.social,
+                "userId": user.user_id,
                 "access_token": access_token,
             }
             print(response_body)
@@ -60,11 +61,14 @@ async def social_auth(
             print("회원가입처리")
             # 존재하지 않는 회원시 회원가입처리
             user_repo.save_user(user_data)
+            user = user_repo.get_user(user_data.email, social=user_data.social)
+
             response_body = {
                 "message": "oauth register successful",
-                "username": user_data.username,
-                "email": user_data.email,
-                "social": user_data.social,
+                "username": user.username,
+                "email": user.email,
+                "social": user.social,
+                "userId": user.user_id,
             }
             print(response_body)
             return JSONResponse(status_code=status.HTTP_200_OK, content=response_body)

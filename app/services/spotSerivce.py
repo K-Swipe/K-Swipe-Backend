@@ -1,5 +1,8 @@
 from fastapi import Depends
-from schema.response import PhotoListResponse, PhotoResponse, SpotListSchema, SpotSchema
+from entities.popularity import Popularity
+from entities.tour import BusanTourInfo
+from schema.request import TumbsupRequest
+from schema.response import PhotoListResponse, PhotoResponse, SpotListSchema, SpotSchema, TumbsupResponse
 from entities.spot import Spot
 from repository.spotRepository import SpotRepository
 
@@ -19,7 +22,13 @@ class SpotService:
 
         return SpotListSchema(spots=[SpotSchema.from_orm(spot) for spot in spot_list])
 
-    def get_spot_photo_list(self) -> PhotoListResponse:
-        spot_list: list[Spot] = self.spotRepository.get_spot_list()
+    def update_popularity(self, thumsupRequest: TumbsupRequest) -> TumbsupResponse:
 
-        return PhotoListResponse(spots=[PhotoResponse.from_orm(spot) for spot in spot_list])
+        popularity: Popularity = self.spotRepository.update_popularity(thumsupRequest)
+
+        return TumbsupResponse.from_orm(popularity)
+
+    # def get_spot_photo_list(self) -> PhotoListResponse:
+    #     spot_list: list[Spot] = self.spotRepository.get_spot_list()
+
+    #     return PhotoListResponse(spots=[PhotoResponse.from_orm(spot) for spot in spot_list])
