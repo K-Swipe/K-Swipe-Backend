@@ -123,10 +123,15 @@ def prediction(info, new_user_info, model):
         places = pd.read_csv(cfg.followup_places_path)
         result = find_hotplace(places)
     else:
-        rec = user_info_df.iloc[0].to_list()
-        rec.append(visiting_candidates)
-        result.append(rec)
-        result = result[0][-1]
+        try:
+            rec = user_info_df.iloc[0].to_list()
+            rec.append(visiting_candidates)
+            result.append(rec)
+            result = result[0][-1]
+        except:
+            places = pd.read_csv(cfg.followup_places_path)
+            result = find_hotplace(places)
+
     return result
 
 
