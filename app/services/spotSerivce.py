@@ -10,12 +10,12 @@ class SpotService:
         self.spotRepository = spotRepository
 
     def get_spot(self, spot_id: int) -> Spot:
-        spot: Spot | None = self.spotRepository.get_spot_one(spot_id)
+        spot: BusanTourInfo | None = self.spotRepository.get_spot_one(spot_id)
 
         return SpotSchema.from_orm(spot)
 
     def get_spot_list(self) -> SpotListSchema:
-        spot_list: list[Spot] = self.spotRepository.get_spot_list()
+        spot_list: list[BusanTourInfo] = self.spotRepository.get_spot_list()
 
         return SpotListSchema(spots=[SpotSchema.from_orm(spot) for spot in spot_list])
 
