@@ -43,3 +43,26 @@ class RecommendationRequest(BaseModel):
     userId: int
     travelPlan: TravelPlan
     travelProfile: TravelProfile
+
+
+class TumbsupRequest(BaseModel):
+    spot_id: int
+    user_id: int
+
+
+class TourItem(BaseModel):
+    name: str
+    id: int
+    lng: float
+    lat: float
+
+
+class GenerateCourseRequest(BaseModel):
+    userId: int
+    tourList: List[TourItem]
+
+
+class AICouserResponse(BaseModel):
+    # userId: int
+    tourId: int
+    tourList: List[TourItem]

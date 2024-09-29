@@ -1,11 +1,13 @@
+import json
 from fastapi import Depends
 import joblib
 import pandas as pd
+from entities.aiCourse import AICourse
 from entities.tour import BusanTourInfo
 from database.connection import get_db
 from services.convert_value import cvt_reason, cvt_style, cvt_thema, cvt_traffic
 from repository.spotRepository import SpotRepository
-from schema.request import RecommendationRequest
+from schema.request import AICouserResponse, GenerateCourseRequest, RecommendationRequest, TourItem
 from schema.response import SpotListSchema
 from sqlalchemy import func, select, delete
 from sqlalchemy.orm import Session
@@ -76,6 +78,64 @@ class AIService:
             request_body.append({"name": spot, "id": id, "lng": lng, "lat": lat})
 
         return request_body
+
+    def add_course_by_user(self, generate_course: GenerateCourseRequest):
+        """AI 추천 코스 저장"""
+
+        # tourList를 JSON 문자열로 변환(ensure_ascii=False: 한글이 유니코드로 출력되지 않도록 설정)
+        tour_list_json = json.dumps([item.dict() for item in generate_course.tourList], ensure_ascii=False)
+
+        print(generate_course)
+
+        # AICourse 인스턴스 생성
+        ai_course = AICourse(tour_list=tour_list_json, user_id=generate_course.userId)
+
+        # 데이터베이스에 추가
+        self.session.add(ai_course)
+        self.session.commit()
+        self.session.refresh(ai_course)
+
+        return ai_course
+
+    def get_course(self, course_id: int) -> GenerateCourseRequest:
+        """AI 추천 코스 단일 조회"""
+
+        ai_course = self.session.scalars(select(AICourse).where(AICourse.id == course_id)).first()
+
+        if ai_course is None:
+            raise Exception("AI Course not found")
+
+        # JSON 문자열을 파싱하여 tourList 생성
+        tour_list = json.loads(ai_course.tour_list)
+
+        # GenerateCourseRequest 객체 생성
+        generate_course_request = GenerateCourseRequest(
+            userId=ai_course.user_id,
+            tourList=[TourItem(**item) for item in tour_list],  # TourItem은 tourList의 각 항목을 나타내는 클래스
+        )
+
+        return generate_course_request
+
+    def get_course_list_by_user(self, user_id: int) -> list:
+        """AI 추천 코스 리스트 조회"""
+
+        ai_course_list = self.session.scalars(select(AICourse).where(AICourse.user_id == user_id)).all()
+
+        # GenerateCourseRequest 객체 리스트 생성
+        generate_course_request_list = []
+        for ai_course in ai_course_list:
+            # JSON 문자열을 파싱하여 tourList 생성
+            tour_list = json.loads(ai_course.tour_list)
+
+            generate_course_request = AICouserResponse(
+                # userId=ai_course.user_id,
+                tourId=ai_course.id,
+                tourList=[TourItem(**item) for item in tour_list],  # TourItem은 tourList의 각 항목을 나타내는 클래스
+            )
+
+            generate_course_request_list.append(generate_course_request)
+
+        return generate_course_request_list
 
     def is_blank_array(self, value, column_name):
         if value == "":
