@@ -18,16 +18,23 @@ def cvt_thema():
     }
     return thema
 
+
 def cvt_reason():
     reason = {
-        "일상을 벗어나 되돌아 볼 기회를 가지고 싶어요": 1,
-        "요즘 너무 바빠 몸과 마음의 재충전이 필요해요": 2,
-        "새로운 역사 및 문화를 배우고 싶어요/경험하고 싶어요": 7,
-        "특별한 추억을 담아 사진에 남기고 싶어요": 3,
-        "특별한 날을 기념하기 위해 여행을 계획중이예요.": 9,
+        0: 1,
+        1: 2,
+        2: 7,
+        3: 3,
+        4: 9,
     }
     return reason
+
 
 def cvt_style():
     style = {"city": 2, "nature": 0}
     return style
+
+
+def cvt_traffic():
+    traffic = {"car": "자가용", "bus": "대중교통 등"}
+    return traffic
