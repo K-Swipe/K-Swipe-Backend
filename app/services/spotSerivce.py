@@ -1,6 +1,7 @@
 from fastapi import Depends
 from entities.popularity import Popularity
 from entities.tour import BusanTourInfo
+from entities.popularity import Popularity
 from schema.request import TumbsupRequest
 from schema.response import PhotoListResponse, PhotoResponse, SpotListSchema, SpotSchema, TumbsupResponse
 from entities.spot import Spot
@@ -28,7 +29,6 @@ class SpotService:
 
         return TumbsupResponse.from_orm(popularity)
 
-    # def get_spot_photo_list(self) -> PhotoListResponse:
-    #     spot_list: list[Spot] = self.spotRepository.get_spot_list()
-
-    #     return PhotoListResponse(spots=[PhotoResponse.from_orm(spot) for spot in spot_list])
+    def get_total_likes(self, spot_id: int) -> int:
+        total_likes: int = self.spotRepository.get_total_likes(spot_id)
+        return total_likes

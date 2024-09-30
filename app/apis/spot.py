@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
+from utils.apiReponse import ApiResponse
 from entities.popularity import Popularity
 from repository.spotRepository import SpotRepository
 from schema.request import TumbsupRequest
@@ -12,69 +13,75 @@ from services.spotSerivce import SpotService
 router = APIRouter(prefix="/spots", tags=["spot"])
 
 
-@router.get("/list", description="spot 리스트 조회", status_code=200, response_model=SpotListResponse)
-def get_spot_list(spot_service: SpotService = Depends()) -> SpotListResponse:
+@router.get("/list", description="spot 리스트 조회", status_code=200)
+def get_spot_list(spot_service: SpotService = Depends()) -> ApiResponse[SpotListResponse]:
     spot_list: SpotListSchema = spot_service.get_spot_list()
 
-    response = SpotListResponse(
-        spots=[
-            SpotReponse(
-                id=spot.id,
-                placeImages=spot.main_img_n,
-                placeName=spot.name,
-                amountLiked=spot.total_likes,
-                placeTitle=spot.title,
-                placeSubtitle=spot.subtitle,
-                placeDescription=spot.itemcntnts,
-                kakaoMapRating=spot.kakao_rating,
-                placewebsite=spot.homepage_u,
-                closedDays=spot.hldy_info,
-                disabilitySupport=spot.middle_siz,
-                openratingHours=spot.usage_time,
-                transportationInfo=spot.trfc_info,
-            )
-            for spot in spot_list.spots
-        ]
-    )
+    spots = [
+        SpotReponse(
+            id=spot.id,
+            placeImages=spot.main_img_n,
+            placeName=spot.name,
+            amountLiked=spot_service.get_total_likes(spot.id),  # 각 spot에 대해 좋아요 개수 가져오기
+            placeTitle=spot.title,
+            placeSubtitle=spot.subtitle,
+            placeDescription=spot.itemcntnts,
+            kakaoMapRating=spot.kakao_rating,
+            placewebsite=spot.homepage_u,
+            closedDays=spot.hidy_info,
+            disabilitySupport=spot.middle_siz,
+            openratingHours=spot.usage_time,
+            transportationInfo=spot.trfc_info,
+        )
+        for spot in spot_list.spots
+    ]
 
-    response_body = {
-        "spotList": response,
+    spot_list = SpotListResponse(spots=spots)
+
+    reponse_body = {
+        "spotList": spot_list,
     }
 
-    # try:
+    try:
+        return ApiResponse(success=True, message="Request was successful.", data=reponse_body)
 
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail="Internal Server Error")
+    except Exception as e:
+        return ApiResponse(success=False, message=str(e), data=None)
 
 
-@router.get("/{spot_id}", description="spot_id로 spot 정보 조회", status_code=200, response_model=SpotReponse)
-def get_spot_detail(spot_id: int, spot_service: SpotService = Depends()) -> SpotReponse:
+@router.get("/", description="spot_id로 spot 정보 조회", status_code=200)
+def get_spot_detail(spot_id: int = 57, spot_service: SpotService = Depends()) -> ApiResponse[SpotReponse]:
     spot: SpotSchema | None = spot_service.get_spot(spot_id)
+
+    total_likes: int = spot_service.get_total_likes(spot_id)
 
     if not spot:
         raise HTTPException(status_code=404, detail="spot not found")
 
-    response = SpotReponse(
+    targer_data = SpotReponse(
         id=spot.id,
         placeImages=spot.main_img_n,
         placeName=spot.name,
-        amountLiked=spot.total_likes,
+        amountLiked=total_likes,
         placeTitle=spot.title,
         placeSubtitle=spot.subtitle,
         placeDescription=spot.itemcntnts,
         kakaoMapRating=spot.kakao_rating,
         placewebsite=spot.homepage_u,
-        closedDays=spot.hldy_info,
+        closedDays=spot.hidy_info,
         disabilitySupport=spot.middle_siz,
         openratingHours=spot.usage_time,
         transportationInfo=spot.trfc_info,
     )
 
+    print(targer_data)
+    print(type(targer_data))
+
     try:
-        return response
+        return ApiResponse(success=True, message="Request was successful.", data=targer_data)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        return ApiResponse(success=False, message=str(e), data=None)
 
 
 @router.post("/thumbsup", description="호출 시, 좋아요를 업데이트 ", status_code=200)

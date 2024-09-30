@@ -65,3 +65,7 @@ class SpotRepository:
             {Spot.total_likes: subquery.c.like_count}, synchronize_session="fetch"  # 세션 동기화
         )
         self.session.commit()
+
+    def get_total_likes(self, spot_id: int) -> int:
+        like_count = self.session.query(func.count(Popularity.id)).filter(Popularity.spot_id == spot_id).scalar()
+        return like_count

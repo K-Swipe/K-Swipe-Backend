@@ -2,8 +2,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 import requests
 
+from utils.apiReponse import ApiResponse
 from services.spotSerivce import SpotService
-from schema.response import PhotoResponse, ShortResponse
+from schema.response import PhotoResponse, ShortListResponse, ShortResponse
 from utils.config import SEARCH_URL, YOUTUBE_API_KEY
 
 
@@ -14,7 +15,7 @@ router = APIRouter(
 
 
 @router.get("/shorts", status_code=200)
-def get_shorts_videos_handler() -> list[ShortResponse]:
+def get_shorts_videos_handler() -> ApiResponse[ShortListResponse]:
 
     params = {
         "part": "snippet",
@@ -32,7 +33,7 @@ def get_shorts_videos_handler() -> list[ShortResponse]:
 
     data = response.json()
 
-    shortsList = []
+    shortsList: ShortListResponse = []
 
     video_id = data.get("items", [])[0]["id"]["videoId"]
 
@@ -46,31 +47,39 @@ def get_shorts_videos_handler() -> list[ShortResponse]:
 
         shortsList.append(response)
 
-    return shortsList
-
-
-@router.get("/photos", response_model=list)
-def get_photo_card_handler(spot_service: SpotService = Depends()) -> List[PhotoResponse]:
-
-    spot_photo_list = spot_service.get_spot_photo_list()
+    response = {
+        "shortsList": shortsList,
+    }
 
     try:
+        return ApiResponse(success=True, message="Request was successful.", data=response)
 
-        response: List[PhotoResponse] = [
-            PhotoResponse(
-                spotId=spot.id,
-                spotImage=spot.main_img_n,
-                spotName=spot.name,
-                spotTitle=spot.title,
-                spotSubtitle=spot.subtitle,
-                address=spot.addr1,
-                kakaoMapRating=spot.kakao_rating,
-            )
-            for spot in spot_photo_list
-        ]
-
-        print(response)
-
-        return response
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        return ApiResponse(success=False, message=str(e), data=None)
+
+
+# @router.get("/photos", response_model=list)
+# def get_photo_card_handler(spot_service: SpotService = Depends()) -> List[PhotoResponse]:
+
+#     spot_photo_list = spot_service.get_spot_photo_list()
+
+#     try:
+
+#         response: List[PhotoResponse] = [
+#             PhotoResponse(
+#                 spotId=spot.id,
+#                 spotImage=spot.main_img_n,
+#                 spotName=spot.name,
+#                 spotTitle=spot.title,
+#                 spotSubtitle=spot.subtitle,
+#                 address=spot.addr1,
+#                 kakaoMapRating=spot.kakao_rating,
+#             )
+#             for spot in spot_photo_list
+#         ]
+
+#         print(response)
+
+#         return response
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail="Internal Server Error")

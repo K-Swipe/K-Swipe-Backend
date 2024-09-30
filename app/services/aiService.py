@@ -2,6 +2,7 @@ import json
 from fastapi import Depends
 import joblib
 import pandas as pd
+from utils.exceptions import NotFoundException
 from entities.aiCourse import AICourse
 from entities.tour import BusanTourInfo
 from database.connection import get_db
@@ -85,12 +86,12 @@ class AIService:
         # tourList를 JSON 문자열로 변환(ensure_ascii=False: 한글이 유니코드로 출력되지 않도록 설정)
         tour_list_json = json.dumps([item.dict() for item in generate_course.tourList], ensure_ascii=False)
 
-        print(generate_course)
+        user = self.session.scalars(select(AICourse).where(AICourse.user_id == generate_course.userId)).first()
+        if not user:
+            raise NotFoundException("User does not exist")
 
-        # AICourse 인스턴스 생성
         ai_course = AICourse(tour_list=tour_list_json, user_id=generate_course.userId)
 
-        # 데이터베이스에 추가
         self.session.add(ai_course)
         self.session.commit()
         self.session.refresh(ai_course)
@@ -103,7 +104,7 @@ class AIService:
         ai_course = self.session.scalars(select(AICourse).where(AICourse.id == course_id)).first()
 
         if ai_course is None:
-            raise Exception("AI Course not found")
+            raise NotFoundException("AI Course not found")
 
         # JSON 문자열을 파싱하여 tourList 생성
         tour_list = json.loads(ai_course.tour_list)
