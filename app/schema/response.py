@@ -18,17 +18,16 @@ class JWTResponse(BaseModel):
 class SpotSchema(BaseModel):
     id: int
     name: str
-    gugun: str
+    gungu: str
     lat: float
     lng: float
-    trav_nm: str
     title: str
     subtitle: str
     addr1: str
     homepage_u: str
     trfc_info: str
     usage_day: str
-    hldy_info: str
+    hidy_info: str
     usage_time: str
     usage_amou: str
     middle_siz: str
@@ -36,40 +35,39 @@ class SpotSchema(BaseModel):
     main_img_t: str
     itemcntnts: str
     kakao_rating: int
-    total_likes: int
 
     class Config:
         orm_mode = True
 
 
 class SpotListSchema(BaseModel):
-    spots: list[SpotSchema]
+    spots: List[SpotSchema]
 
     class Config:
         orm_mode = True
 
 
 class SpotReponse(BaseModel):
-    id: int
-    placeImages: str
-    placeName: str
-    amountLiked: int
-    placeTitle: str
-    placeSubtitle: str
-    placeDescription: str
-    kakaoMapRating: float
-    placewebsite: str
-    closedDays: str
-    disabilitySupport: str
-    openratingHours: str
-    transportationInfo: str
+    id: int | None
+    placeImages: str | None
+    placeName: str | None
+    amountLiked: int | None
+    placeTitle: str | None
+    placeSubtitle: str | None
+    placeDescription: str | None
+    kakaoMapRating: float | None
+    placewebsite: str | None
+    closedDays: str | None
+    disabilitySupport: str | None
+    openratingHours: str | None
+    transportationInfo: str | None
 
     class Config:
         orm_mode = True
 
 
 class SpotListResponse(BaseModel):
-    spots: list[SpotReponse]
+    spots: List[SpotReponse]
 
     class Config:
         orm_mode = True
@@ -89,6 +87,13 @@ class ShortResponse(BaseModel):
     channelTitle: str
 
 
+class ShortListResponse(BaseModel):
+    shorts: List[ShortResponse]
+
+    class Config:
+        orm_mode = True
+
+
 class PhotoResponse(BaseModel):
     id: int
     main_img_n: str
@@ -103,7 +108,7 @@ class PhotoResponse(BaseModel):
 
 
 class PhotoListResponse(BaseModel):
-    spots: list[PhotoResponse]
+    spots: List[PhotoResponse]
 
     class Config:
         orm_mode = True
